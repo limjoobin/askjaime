@@ -9,15 +9,15 @@ example_messages = [
     {"text": "Give me an example of ..."}
 ]
 
-chatbot = gr.Chatbot(placeholder="I am Jaime ask me anything!",
-                    type="messages")
+chatbot = gr.Chatbot(placeholder="Hi, I am Jaime. You can ask me anything!",
+                     type="messages")
 
 with gr.Blocks() as demo:
     chat_interface= gr.ChatInterface(
         fn=lambda message, history: "dog",
         type="messages",
         title="Ask Jaime",
-        description="placeholder description",
+        description="Powered by ...",
         examples=example_messages,
         chatbot=chatbot
     )
