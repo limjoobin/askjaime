@@ -4,10 +4,7 @@
 """
 import gradio as gr
 
-# Put it all here for now, eventually will move it into their own individual file for easier customization.
-example_messages = [
-    {"text": "Give me an example of ..."}
-]
+from utils import example_messages
 
 chatbot = gr.Chatbot(placeholder="Hi, I am Jaime. You can ask me anything!",
                      type="messages")
