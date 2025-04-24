@@ -39,7 +39,7 @@ wheels = [
 ]
 
 [[package]]
-name = "askjaime"
+name = "askjaime-frontend"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
