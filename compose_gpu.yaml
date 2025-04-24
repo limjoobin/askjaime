@@ -1,6 +1,8 @@
 services:
   llamacpp-server:
     image: ghcr.io/ggml-org/llama.cpp:server-cuda
+    environment: 
+      LLAMA_ARG_N_GPU_LAYERS: 99
     deploy:
         resources:
           reservations:
