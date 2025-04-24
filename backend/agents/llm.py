@@ -8,4 +8,4 @@ llm = OpenAI(base_url="http://localhost:8080/v1",
              api_key="not_needed")
 
 if __name__ == "__main__":
-    print(llm.invoke("What is the capital of France?"))
+    print(llm.invoke("The meaning of life is"))
