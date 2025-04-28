@@ -1,6 +1,6 @@
 services:
   llamacpp-server:
-    image: ghcr.io/ggml-org/llama.cpp:server
+    image: ghcr.io/ggml-org/llama.cpp:server-b5124
     ports:
       - 8080:8080
     volumes:
