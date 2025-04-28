@@ -8,6 +8,7 @@ services:
     environment:
       # alternatively, you can use "LLAMA_ARG_MODEL_URL" to download the model
       LLAMA_ARG_MODEL_URL: https://huggingface.co/bartowski/Qwen2.5-7B-Instruct-GGUF/resolve/main/Qwen2.5-7B-Instruct-Q4_K_M.gguf
+      LLAMA_CACHE: /models
       LLAMA_ARG_CTX_SIZE: 4096
       LLAMA_ARG_N_PARALLEL: 2
       LLAMA_ARG_ENDPOINT_METRICS: 1
