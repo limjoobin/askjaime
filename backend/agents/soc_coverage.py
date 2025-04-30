@@ -2,14 +2,6 @@ from langchain_core.prompts import PromptTemplate, FewShotPromptTemplate
 
 from llm import llm
 
-system_template = r"""
-# IDENTITY and PURPOSE
-You are an expert cybersecurity detection engineer for a SIEM company. Your task is to generate Splunk rules for detecting particular Tactics, Techniques, and Procedures (TTPs) used by threat actors.
-You will be provided with a description of the TTP, and you need to create a Splunk rule that can detect them in logs.
-The Splunk rule should be in YAML format and should include the following fields: name, id, version, date, author, status, type, description, data_source, search, how_to_implement, known_false_positives, references, drilldown_searches, tags.
-The rule should be based on the MITRE ATT&CK framework and should include the relevant ATT&CK IDs.
-"""
-
 # Probably abstract the system prompt to the agent
 prompt_template = """
 # IDENTITY and PURPOSE
@@ -24,24 +16,34 @@ Take a deep breath and think step by step about how to best accomplish this goal
 
 - Create a virtual whiteboard in your mind and list down all the behavioural patterns, such as indicators and signatures, associated with the TTP, across threat scenarios.
 
-- Read the rules provided throughly and think of the threat scenarios that this rule is able to address.
+- Read the rules provided throughly and think of the threat scenarios that this rule is able to address. 
 
 - Identify the detection mechanism responsible for addressing the particular threat scenario.
 
 # INSTRUCTIONS
-
-Based on the following rules, evaluate the coverage of the current SOC operations.
+You are given a set of rules based on Splunk Rules, which are meant for security detection Based on the following rules, evaluate the coverage of the current SOC operations.
 
 Rules:
 {rules}
 
-Now, tell me how protected I am against {TTP}, based on the behaviour observed by common implementations of the TTP.
+Now, tell me how protected I am against {TTP}, based on the behaviour observed by common implementations of the TTP. Identify the rules that address the behaviour.
+
+You are required to state your thinking process, step-by-step.
 
 # OUTPUT FORMAT
-- Output a section containing the following:
-  1. Short description of the identified behavioural patterns of the TTP
-  2. The rule that properly addresses the threat scenarios
-  3. The detection mechanism resposible in the rule that addresses the TTP
+Format the output into the following three sections.
+
+DESCRIPTION
+  - A short description of the TTP and its identified behavioural patterns. Also include examples of different execution methods of this TTP.
+
+RULES COVERAGE
+For each rule that you identify, write a short section containing the following:
+  - A paragraph about the description of the rule
+  - The threat scenario addressed by the rule
+  - Explanation of how this rule addrresses the TTP, and the detection mechanism responsible.
+
+SUMMARY
+At the end, write a short paragraph to summarize your findings.
 """
 
 
@@ -62,7 +64,7 @@ sample_rules = [
 if __name__ == "__main__":
     variables={
         "TTP": 'T1547.001: Registry Run Keys / Startup Folder',
-        "rules": "\n".join(sample_rules)
+        "rules": "- " + "\n- ".join(sample_rules)
     }
     chain = prompt | llm
 
