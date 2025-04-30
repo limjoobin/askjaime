@@ -1,10 +1,5 @@
 # askjaime
 
-# SKY-GPT
-## Yield
-## Analyze
-## Protect
-
 ## Instructions
 To run the LLM container on CPU, do
 ```
