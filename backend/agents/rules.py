@@ -1,26 +1,26 @@
-"""
-This file takes inspiration from the following prompt template:
-https://github.com/danielmiessler/fabric/blob/a9374c128becbe93815acf808180f59b98bc6838/patterns/create_sigma_rules/system.md
-"""
-
 from langchain_core.prompts import PromptTemplate, FewShotPromptTemplate
+from langchain_core.tools import tool
+from langgraph.prebuilt import create_react_agent
+
 
 from llm import llm
 
-system_template = r"""
+system_prompt = (
+"""
 # IDENTITY and PURPOSE
 You are an expert cybersecurity detection engineer for a SIEM company. Your task is to generate Splunk rules for detecting particular Tactics, Techniques, and Procedures (TTPs) used by threat actors.
 You will be provided with a description of the TTP, and you need to create a Splunk rule that can detect them in logs.
 The Splunk rule should be in YAML format and should include the following fields: name, id, version, date, author, status, type, description, data_source, search, how_to_implement, known_false_positives, references, drilldown_searches, tags.
 The rule should be based on the MITRE ATT&CK framework and should include the relevant ATT&CK IDs.
 """
+)
 
-example_prompt = PromptTemplate.from_template("Input: {input}\n\nOutput: {output}")
+example_prompt = PromptTemplate.from_template("Input: {input}\nOutput: {output}")
 
-examples = [
-    {
-      "input": "Help me to create a rule to detect the use of Mimikatz Pass the Ticket Command Line Parameters.",
-      "output": r"""
+# Example 1
+input1 = "Help me to create a rule to detect the use of Mimikatz Pass The Ticket Command Line Parameters."
+output1 = (
+r"""
 name: Mimikatz PassTheTicket CommandLine Parameters
 id: 13bbd574-83ac-11ec-99d4-acde48001122
 version: 7
@@ -104,11 +104,14 @@ tags:
   - Splunk Enterprise
   - Splunk Enterprise Security
   - Splunk Cloud
-  security_domain: endpoint"""
-    },
-    {
-        "input": "Help me to create a rule to detect suspicious DLL modules loaded by the calculator application",
-        "output": r"""
+  security_domain: endpoint
+"""
+)
+
+# Example 2
+input2 = "Help me to create a rule to detect suspicious DLL modules loaded by the calculator application"
+output2 = (
+r"""
 name: Windows DLL Side-Loading In Calc
 id: af01f6db-26ac-440e-8d89-2793e303f137
 version: 7
@@ -175,19 +178,47 @@ tags:
     - Earth Alux
   asset_type: Endpoint
   mitre_attack_id:
-    - T1574.001"""
-    }
+    - T1574.001
+"""
+)
+
+examples = [
+    dict(input=input1, output=output1),
+    dict(input=input2, output=output2)
 ]
 
 prompt = FewShotPromptTemplate(
-    examples=examples,
-    example_prompt=example_prompt,
-    prefix=system_template,
-    suffix="Input: {input}\n\nOutput:",
-    input_variables=["input"],
-    example_separator="\n\n"
+    examples=examples, example_prompt=example_prompt,
+    prefix=system_prompt, suffix="Input: {input}\nOutput:",
+    input_variables=["input"], example_separator="\n\n"
+)
+
+@tool
+def generate_rules(user_input):
+    """Use this to generate rules."""
+    chain = prompt | llm
+    return chain.invoke(dict(input=user_input)).content
+
+graph = create_react_agent(
+    model=llm,
+    tools=[generate_rules]
 )
 
 if __name__ == "__main__":
-    chain = prompt | llm
-    print(chain.invoke({"input": "Help me to create a rule to detect named pipe impersonation."}).content)
+    # print(generate_rules("Help create a rule to detect named pipe impersonation."))
+    graph.get_graph().draw_mermaid_png(output_file_path="graph.png")
+
+    def print_stream(stream):
+        for s in stream:
+            message = s["messages"][-1]
+            if isinstance(message, tuple): print(message)
+            else: message.pretty_print()
+
+    inputs = dict(messages=[("user", "help to create a rule to detect DLL Search Order Hijacking")])
+    print_stream(graph.stream(inputs, stream_mode="values"))
+
+
+
+
+# def call_rule_generator(state):
+#     return rule_generator.invoke(state)
