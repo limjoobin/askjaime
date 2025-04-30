@@ -44,12 +44,3 @@ Based on the common implementations of T1547.001: Registry Run Keys / Startup Fo
 
 The findings indicate that the rules provided offer robust protection against T1547.001, as they effectively detect and respond to the TTP through registry modifications.
 
-### DESCRIPTION
-
-**TTP Description and Behavioral Patterns**
-
-T1547.001, also known as "Registry Run Keys / Startup Folder," involves attackers modifying the Windows registry to add malicious payloads to the startup sequence. This ensures that the malware runs every time the system boots, providing persistence. Common behavioral patterns include:
-
-1. **Registry Modifications**: Attackers often add entries to the `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run` or `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` keys.
-2. **Startup Folders**: Malware may place executable files in the `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup` folder to run at startup.
-3. **Execution at Startup**: The malware ensures that it runs as part of the startup process, often through the `CommandLine` parameters.

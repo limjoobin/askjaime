@@ -21,7 +21,7 @@ Take a deep breath and think step by step about how to best accomplish this goal
 - Identify the detection mechanism responsible for addressing the particular threat scenario.
 
 # INSTRUCTIONS
-You are given a set of rules based on Splunk Rules, which are meant for security detection Based on the following rules, evaluate the coverage of the current SOC operations.
+You are given a set of Splunk rules meant for security detection. Based on the following rules, evaluate the coverage of the current SOC operations.
 
 Rules:
 {rules}
@@ -41,6 +41,7 @@ For each rule that you identify, write a short section containing the following:
   - A paragraph about the description of the rule
   - The threat scenario addressed by the rule
   - Explanation of how this rule addrresses the TTP, and the detection mechanism responsible.
+Ensure that there is no repetition of rules.
 
 SUMMARY
 At the end, write a short paragraph to summarize your findings.
@@ -64,7 +65,7 @@ sample_rules = [
 if __name__ == "__main__":
     variables={
         "TTP": 'T1547.001: Registry Run Keys / Startup Folder',
-        "rules": "- " + "\n- ".join(sample_rules)
+        "rules": "\n".join(sample_rules)
     }
     chain = prompt | llm
 
