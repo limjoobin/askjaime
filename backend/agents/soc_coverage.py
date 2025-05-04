@@ -5,7 +5,7 @@ from langchain_core.tools import tool
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.prebuilt import create_react_agent
 
-from llm import llm
+from .llm import llm
 
 system_prompt = """
 # IDENTITY and PURPOSE
@@ -126,16 +126,19 @@ async def get_soc_rules()-> str:
         
 async def main(agent):        
     TTP = 'T1547.001: Registry Run Keys / Startup Folder'
-    resp = await agent.ainvoke(
-        {"messages": [{"role": "user",
-                        "content": f"What is my SOC coverage for {TTP}"}]}
-    )
-    print(resp)
+    # resp = await agent.ainvoke(
+    #     {"messages": [{"role": "user",
+    #                     "content": f"What is my SOC coverage for {TTP}"}]}
+    # )
+    # print(resp)
+    async for event in soc_coverage_agent.astream({"user": f"What is my SOC coverage for {TTP}?"}, stream_mode="updates"):
+        print(event)
 
 soc_coverage_agent = create_react_agent(
                         model=llm,
                         tools=[get_soc_rules],
-                        prompt=system_prompt
+                        prompt=system_prompt,
+                        name="soc-coverage-agent"
                     )
 
 if __name__ == "__main__":
@@ -148,4 +151,7 @@ if __name__ == "__main__":
     # print(chain.invoke(variables).content)
 
     asyncio.run(main(soc_coverage_agent))
+
+    
+
     

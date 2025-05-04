@@ -6,6 +6,8 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "gradio>=5.25.2",
+    "langchain-mcp-adapters>=0.0.9",
+    "langchain-openai>=0.3.16",
     "langgraph-supervisor>=0.0.20",
 ]
 
