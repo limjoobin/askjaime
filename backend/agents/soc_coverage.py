@@ -124,19 +124,19 @@ async def get_soc_rules()-> str:
         print("Obtained rules")
         return rules[0].as_string()
         
-async def main():
-    agent = create_react_agent(
-                        model=llm,
-                        tools=[get_soc_rules],
-                        prompt=system_prompt
-                    )
-            
+async def main(agent):        
     TTP = 'T1547.001: Registry Run Keys / Startup Folder'
     resp = await agent.ainvoke(
         {"messages": [{"role": "user",
                         "content": f"What is my SOC coverage for {TTP}"}]}
     )
     print(resp)
+
+soc_coverage_agent = create_react_agent(
+                        model=llm,
+                        tools=[get_soc_rules],
+                        prompt=system_prompt
+                    )
 
 if __name__ == "__main__":
     # variables={
@@ -147,5 +147,5 @@ if __name__ == "__main__":
 
     # print(chain.invoke(variables).content)
 
-    asyncio.run(main())
+    asyncio.run(main(soc_coverage_agent))
     
