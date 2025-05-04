@@ -2,7 +2,7 @@ from fastmcp import FastMCP
 
 mcp = FastMCP(name="DetectionEngineeringMCPServer")
 
-@mcp.resource("data:deployed-rules")
+@mcp.resource("data://deployed-rules")
 def get_deployed_rules() -> list:
     """
         Provides the Splunk rules already deployed in the Security Operations Center (SOC)
@@ -18,3 +18,6 @@ def get_deployed_rules() -> list:
     ]   
 
     return sample_rules
+
+if __name__ == '__main__':
+    mcp.run(transport="sse", host="localhost", port=9000)
