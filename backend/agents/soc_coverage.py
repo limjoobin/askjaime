@@ -27,7 +27,8 @@ Take a deep breath and think step by step about how to best accomplish this goal
 - Identify the detection mechanism responsible for addressing the particular threat scenario.
 
 # INSTRUCTIONS
-Based on the rules retrieved from the Security Operations Center (SOC), evaluate the coverage of current SOC operations.
+Based on the rules retrieved from the Security Operations Center (SOC) listed below, evaluate the coverage of current SOC operations.
+{rules}
 
 # OUTPUT
 Format the output into the following three sections.
@@ -123,6 +124,16 @@ async def get_soc_rules()-> str:
         rules = await client.get_resources(server_name="detection-engineering", uris="data://deployed-rules")
         print("Obtained rules")
         return rules[0].as_string()
+    
+@tool
+def get_soc_coverage(rules):
+    """
+    Use to get the Security Operations Center (SOC) coverage given a set of rules
+    """
+    prompt = PromptTemplate.from_template(system_prompt)
+    chain = prompt | llm
+    return chain.invoke(dict(rules=rules)).content
+
         
 async def main(agent):        
     TTP = 'T1547.001: Registry Run Keys / Startup Folder'
