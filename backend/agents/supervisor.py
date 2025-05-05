@@ -1,8 +1,9 @@
 from .llm import llm
-from .soc_coverage import soc_coverage_agent
-from .rules import rule_generator_agent
+from .soc_coverage import get_soc_coverage, get_soc_rules
+from .rules import generate_rules
 
 from langgraph_supervisor import create_supervisor
+from langgraph.prebuilt import create_react_agent
 
 system_prompt = """
 You are a central AI assistant responsible for routing user queries to the most appropriate specialized agent.
@@ -20,11 +21,29 @@ Your job is to:
 Maintain a helpful, neutral tone. Never fabricate responses. Do not attempt to solve tasks yourself—your role is to delegate.
 """
 
-supervisor_workflow = create_supervisor(
+# supervisor_workflow = create_supervisor(
+#     model=llm,
+#     agents=[soc_coverage_agent, rule_generator_agent],
+#     prompt=system_prompt,
+#     add_handoff_back_messages=False,
+#     output_mode='last_message'
+# )
+# supervisor = supervisor_workflow.compile()
+supervisor = create_react_agent(
     model=llm,
-    agents=[soc_coverage_agent, rule_generator_agent],
-    prompt=system_prompt,
-    add_handoff_back_messages=False,
-    output_mode='last_message'
+    tools=[get_soc_coverage, get_soc_rules, generate_rules]
 )
-supervisor = supervisor_workflow.compile()
+
+if __name__ == "__main__":
+    import asyncio
+    def print_stream(stream):
+        for s in stream:
+            message = s["messages"][-1]
+            if isinstance(message, tuple): print(message)
+            else: message.pretty_print()
+    
+    async def main():
+        inputs = dict(messages=[("user", "help to create a rule to detect DLL Search Order Hijacking")])
+        print_stream(supervisor.astream(inputs, stream_mode="values"))
+    
+    asyncio.run(main())
