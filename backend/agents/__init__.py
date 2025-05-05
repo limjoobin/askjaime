@@ -1,2 +1,1 @@
-from .soc_coverage import soc_coverage_agent
-from .llm import llm
+from .supervisor import supervisor
