@@ -199,14 +199,15 @@ def generate_rules(user_input):
     chain = prompt | llm
     return chain.invoke(dict(input=user_input)).content
 
-graph = create_react_agent(
+rule_generator_agent = create_react_agent(
     model=llm,
-    tools=[generate_rules]
+    tools=[generate_rules],
+    name="rule_generator"
 )
 
 if __name__ == "__main__":
     # print(generate_rules("Help create a rule to detect named pipe impersonation."))
-    graph.get_graph().draw_mermaid_png(output_file_path="graph.png")
+    rule_generator_agent.get_graph().draw_mermaid_png(output_file_path="graph.png")
 
     def print_stream(stream):
         for s in stream:
@@ -215,10 +216,4 @@ if __name__ == "__main__":
             else: message.pretty_print()
 
     inputs = dict(messages=[("user", "help to create a rule to detect DLL Search Order Hijacking")])
-    print_stream(graph.stream(inputs, stream_mode="values"))
-
-
-
-
-# def call_rule_generator(state):
-#     return rule_generator.invoke(state)
+    print_stream(rule_generator_agent.stream(inputs, stream_mode="values"))
