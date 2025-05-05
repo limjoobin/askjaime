@@ -1,6 +1,6 @@
 from .llm import llm
 from .soc_coverage import get_soc_coverage, get_soc_rules
-from .rules import generate_rules
+from .rules import generate_rules, find_suitable_log_event
 
 from langgraph_supervisor import create_supervisor
 from langgraph.prebuilt import create_react_agent
@@ -31,7 +31,7 @@ Maintain a helpful, neutral tone. Never fabricate responses. Do not attempt to s
 # supervisor = supervisor_workflow.compile()
 supervisor = create_react_agent(
     model=llm,
-    tools=[get_soc_coverage, get_soc_rules, generate_rules]
+    tools=[get_soc_coverage, get_soc_rules, generate_rules, find_suitable_log_event]
 )
 
 if __name__ == "__main__":
