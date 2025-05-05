@@ -1,6 +1,6 @@
 services:
   llamacpp-server:
-    image: ghcr.io/ggml-org/llama.cpp:server-cuda
+    image: ghcr.io/ggml-org/llama.cpp:server-cuda-b5124
     environment: 
       LLAMA_ARG_N_GPU_LAYERS: 99
     deploy:
