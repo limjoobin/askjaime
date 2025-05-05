@@ -9,35 +9,64 @@ import asyncio
 
 from backend.agents import supervisor
 
+async def interact_with_agents(prompt, history):
+    # TODO: FIX THE SYSTEM PROMPT, FIX THE MESSAGES AND CHATBOT TOO
+    history.append(ChatMessage(role="user", content=prompt))
+    # yield messages
+    output = []
+    # async for chunk in supervisor.astream({"user": prompt}):
+    async for chunk in supervisor.astream(
+        {"messages": [{"role": "user", "content": prompt}]},
+        stream_mode="updates",
+    ):
+        print(chunk)
+        if 'agent' in chunk.keys():
+            agent_response = chunk['agent']['messages'][0]
+            response_text = agent_response.text()
+            #if "tool_calls" in agent_response.additional_kwargs.keys():
+            if agent_response.tool_calls:
+                # Tool invoked
+                response = ChatMessage(role="assistant", 
+                                       content=response_text,
+                                       metadata={"title": f"🛠️ Used Tool: {agent_response.tool_calls[0]['name']}"})
+            else:
+                response = ChatMessage(role="assistant", content=response_text)
+            history.append(response)
+            output.append(response)
+            yield output
+
+
+
+    '''if "messages" in chunk.keys():
+        tool_use = []
+        response_text = ""
+        for response in chunk["messages"]:
+            if response.type == "tool":
+                # tool call
+                tool_use.append(response.name)
+            elif response.type == "ai":
+                if len(response.text()) == 0:
+                    # There is an empty response from the llm when there is a tool call
+                    continue
+                else:
+                    response_text = response.text()
+        # agent_response = chunk["messages"][-1] # presumably [0] to get latest message, if stream mode = 'updates', but i don't think we should do that, it separates the output from the tool call, and the output from llm itself       
+        if tool_use:
+            response = ChatMessage(role="assistant", 
+                                    content=response_text,
+                                    metadata={"title": f"🛠️ Used Tools: {", ".join(tool_use)}"})
+        else:
+            response = ChatMessage(role="assistant", content=response_text)
+    else:
+        response = ChatMessage(role="assistant", content="assistant")
+    history.append(response)
+    yield response'''
+
 chatbot = gr.Chatbot(value='',
                      placeholder="Hi, I am Jaime. You can ask me anything!",
                      show_copy_button=True,
-                     type="messages")
-
-async def interact_with_agents(prompt, messages):
-    # TODO: FIX THE SYSTEM PROMPT, FIX THE MESSAGES AND CHATBOT TOO
-    messages.append(ChatMessage(role="user", content=prompt))
-    yield messages
-
-    async for chunk in supervisor.astream({"user": prompt}):
-        print(chunk)
-        if "supervisor" in chunk.keys():
-            message = chunk['supervisor']['messages'][0]
-            print(message)
-            additional_kwargs = message.additional_kwargs
-            if "tool_calls" in additional_kwargs:
-                tool_message = chunk['supervisor']['messages'][1].text()
-                messages.append(ChatMessage(role="assistant", 
-                                            content=message.text(),
-                                            metadata={"title": f"🛠️ Using {tool_message}"}))
-            else:
-                messages.append(ChatMessage(role="assistant", content=message.text()))
-            yield messages
-        elif "soc-coverage-agent" in chunk.keys():
-            message = chunk['soc-coverage-agent']['messages'][0]
-            messages.append(ChatMessage(role="assistant", 
-                                            content=message.text(),
-                                            metadata={"title": f"🛠️ Answer obtained from SOC Coverage Agent"}))
+                     type="messages",
+                     height="70vh")
 
 with gr.Blocks() as demo:
     chat_interface= gr.ChatInterface(
@@ -45,7 +74,10 @@ with gr.Blocks() as demo:
         type="messages",
         title="Ask Jaime",
         description="Powered by ...",
-        chatbot=chatbot
+        chatbot=chatbot,
+        show_progress='full',
+        fill_height=True, 
+        fill_width=True
     )
 
 if __name__ == '__main__':
