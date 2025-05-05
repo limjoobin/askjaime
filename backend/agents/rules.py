@@ -3,7 +3,7 @@ from langchain_core.tools import tool
 from langgraph.prebuilt import create_react_agent
 
 
-from llm import llm
+from .llm import llm
 
 system_prompt = (
 """

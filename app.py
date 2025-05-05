@@ -9,8 +9,6 @@ import asyncio
 
 from backend.agents import supervisor
 
-
-
 chatbot = gr.Chatbot(value='',
                      placeholder="Hi, I am Jaime. You can ask me anything!",
                      show_copy_button=True,
