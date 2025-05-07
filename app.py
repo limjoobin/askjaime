@@ -4,9 +4,8 @@
 """
 import gradio as gr
 from gradio import ChatMessage
-import random
-import asyncio
 
+from backend.agents.llm import llm
 from backend.agents import supervisor
 
 async def interact_with_agents(prompt, history):
@@ -17,6 +16,9 @@ async def interact_with_agents(prompt, history):
     # async for chunk in supervisor.astream({"user": prompt}):
     async for chunk in supervisor.astream(
         {"messages": [{"role": "user", "content": prompt}]},
+        # config=dict(
+        #     configurable=dict(thread_id=1)
+        # ),
         stream_mode="updates",
     ):
         print(chunk)
@@ -63,17 +65,18 @@ async def interact_with_agents(prompt, history):
     yield response'''
 
 chatbot = gr.Chatbot(value='',
-                     placeholder="Hi, I am Jaime. You can ask me anything!",
+                     placeholder="Hi, I am Otterini. You can ask me anything!",
                      show_copy_button=True,
                      type="messages",
                      height="70vh")
 
 with gr.Blocks() as demo:
+    logo = gr.Image("otter.jpg", height=100, width=100)
     chat_interface= gr.ChatInterface(
         fn = interact_with_agents,
         type="messages",
-        title="Ask Jaime",
-        description="Powered by ...",
+        title="Ask Otter",
+        description=f"Powered by {llm.model_name.split(':')[0]}",
         chatbot=chatbot,
         show_progress='full',
         fill_height=True, 
