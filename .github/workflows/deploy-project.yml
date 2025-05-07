@@ -1,0 +1,25 @@
+# Deploy project to EC2 upon push to main.
+name: Project Deployment to EC2
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deployment:
+    name: Deploy code to EC2 instance
+    runs-on: ubuntu-latest
+    permissions:
+        contents: read
+    steps:
+      - name: Get latest pushed code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: | # Only checkout the following files and directories
+            backend/
+            frontend/
+            mcp-server/
+            app.py
+            uv.lock
+        
+        
+        
