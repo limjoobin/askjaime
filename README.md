@@ -1,6 +1,14 @@
-# askjaime
+# Ask Otter
+![mascot](otter.jpg)
 
 ## Instructions
+Configure your environment by adding a file `.env` into the root directory.
+
+```env
+llm_server=http://localhost:8080
+api_key=your_api_key
+```
+
 To run the LLM container on CPU, do
 ```
 docker compose up
